@@ -1,8 +1,11 @@
 package com.example.sunnysingh.parking;
 
         import android.Manifest;
+        import android.app.IntentService;
+        import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
+        import android.content.IntentFilter;
         import android.content.pm.PackageManager;
         import android.graphics.Color;
         import android.location.Address;
@@ -39,6 +42,7 @@ package com.example.sunnysingh.parking;
         import com.google.android.gms.maps.model.LatLng;
         import com.google.android.gms.maps.model.Marker;
         import com.google.android.gms.maps.model.MarkerOptions;
+        import com.google.android.gms.maps.model.Polyline;
         import com.google.android.gms.maps.model.PolylineOptions;
 
         import org.json.JSONArray;
@@ -69,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements
 
     //Our Map
     private GoogleMap mMap;
+
     private Button currentButton;
     //To store longitude and latitude from map
     private double longitude;
@@ -77,16 +82,18 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap googleMap;
     ArrayList markerPoints = new ArrayList();
     private ArrayList<LatLng> latlngs = new ArrayList<>();
-    JSONArray jsonArray = new JSONArray();
+   // JSONArray jsonArray = new JSONArray();
     private Button search;
     private static final String LOG_TAG = "Gpa";
-
+    Polyline polylineFinal;
+private static int count = 0;
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
     private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
     private static final String OUT_JSON = "/json";
 
     private static final String API_KEY = "AIzaSyCa-1vbasAKg3JFn2J79KiG8qOGG_Q-RH0";
-
+    private static final String mycurrentlocationurl = "https://intense-refuge-23593.herokuapp.com/cool";
+    private static final String searchurl = "https://intense-refuge-23593.herokuapp.com/dlf";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +109,6 @@ public class MapsActivity extends FragmentActivity implements
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
 
 
-
         autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
 
         autoCompView.setOnItemClickListener(this);
@@ -116,8 +122,12 @@ public class MapsActivity extends FragmentActivity implements
         currentButton = findViewById(R.id.buttonCurrent);
         search = findViewById(R.id.search);
         checkLocationPermission();
+        registerReceiver(new OnDemandBroadcast(), new IntentFilter(
+                "com.ram.CUSTOM_BROADCAST"));
+        registerReceiver(new PeriodicBroadcast(), new IntentFilter(
+                "com.ram.CUSTOM_BROADCAST2"));
 /// Array of JSON Objects for lat and long
-        JSONObject parking2 = new JSONObject();
+      /*  JSONObject parking2 = new JSONObject();
         try {
             parking2.put("latitude", 28.629964);
             parking2.put("longitude", 77.436197);
@@ -231,8 +241,8 @@ public class MapsActivity extends FragmentActivity implements
         jsonArray.put(parking10);
 ///////////////////////////////////////////////
     }
-
-
+*/
+    }
     @Override
     protected void onStart() {
         googleApiClient.connect();
@@ -272,7 +282,7 @@ public class MapsActivity extends FragmentActivity implements
 
         //Creating a LatLng Object to store Coordinates
         LatLng latLng = new LatLng(latitude, longitude);
-
+        latlngs.clear();
         //Adding marker to map
         mMap.addMarker(new MarkerOptions()
                 .position(latLng) //setting position
@@ -288,6 +298,7 @@ public class MapsActivity extends FragmentActivity implements
         mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
         markerPoints.add(latLng);
 
+
     }
 
     @Override
@@ -301,8 +312,20 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         getCurrentLocation();
+        Log.d("cool","");
+        Intent demandservice = new Intent(getApplicationContext(),
+                OnDemand.class);
+        //demandservice.putExtra("location",latlngs.get(0));
+        demandservice.putExtra("url",mycurrentlocationurl);
+        startService(demandservice);
+        Log.d("demand service started","");
+        Intent periodicservice = new Intent(getApplicationContext(),
+         PeriodicService.class);
+        startService(periodicservice);
+        //Log.d("periodic started","");
+
         // Adding new item to the ArrayList
-        MarkerOptions options = new MarkerOptions();
+        /*MarkerOptions options = new MarkerOptions();
         try {
 
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -314,20 +337,21 @@ public class MapsActivity extends FragmentActivity implements
             options.snippet("someDesc");
             options.icon(BitmapDescriptorFactory.defaultMarker(color));
             mMap.addMarker(options);
+                // start on demand service to get nearby parking slot
+                // start periodic service
 
         }
         }catch(JSONException e) {
             e.printStackTrace();
         }
-        // Add new marker to the Google Map Android API V2
-
-        // Checks, whether start and end locations are captured
+*/
            }
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        mMap.clear();
-        getCurrentLocation();
-
+       // mMap.clear();
+        //getCurrentLocation();
+// here we have to handle 3 cases that is marker click action of current parking lots, marker click action of 10 lots and of searched lots
+        /*
         MarkerOptions options = new MarkerOptions();
         try {
 
@@ -344,13 +368,20 @@ public class MapsActivity extends FragmentActivity implements
             }
         }catch(JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
             LatLng origin = latlngs.get(0);
             final LatLng dest = marker.getPosition();
 
             // Getting URL to the Google Directions API
-            String url = getDirectionsUrl(origin, dest);
+        if(count==0)
+        {
+            count++;
+        }
+        else if(count==1) {
+            polylineFinal.remove();
+        }
+        String url = getDirectionsUrl(origin, dest);
 
             DownloadTask downloadTask = new DownloadTask();
 
@@ -406,7 +437,14 @@ public class MapsActivity extends FragmentActivity implements
             }
             Address address = addressList.get(0);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            Intent demandservice = new Intent(getApplicationContext(),
+                    OnDemand.class);
+           // demandservice.putExtra("location",addressList.get(0));
+            demandservice.putExtra("url",searchurl);
+            startService(demandservice);
+
+            // start on demand service and get searched parking lots
+            //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
     }
@@ -574,7 +612,7 @@ public class MapsActivity extends FragmentActivity implements
             }
 
 // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
+             polylineFinal = mMap.addPolyline(lineOptions);
         }
     }
 
@@ -749,4 +787,86 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
+    class OnDemandBroadcast extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            String jsonResult = intent.getStringExtra("jsonresult");
+            MarkerOptions options = new MarkerOptions();
+
+
+            try {
+                JSONArray array = new JSONArray(jsonResult);
+                if (array.getJSONObject(0).get("id").equals("current")) {
+                    for (int i = 1; i < array.length(); i++) {
+                        JSONObject e = array.getJSONObject(i);
+                        LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
+                        int color = e.getInt("color");
+                        options.position(point);
+                        options.title("someTitle");
+                        options.snippet("someDesc");
+                        options.icon(BitmapDescriptorFactory.defaultMarker(color));
+                        mMap.addMarker(options);
+
+                    }
+                }
+                    if (array.getJSONObject(0).get("id").equals("searched")) {
+                        for (int i = 1; i < array.length(); i++) {
+                            JSONObject e = array.getJSONObject(i);
+                            LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
+                            int color = e.getInt("color");
+                            options.position(point);
+                            options.title("someTitle");
+                            options.snippet("someDesc");
+                            options.icon(BitmapDescriptorFactory.defaultMarker(color));
+                            mMap.addMarker(options);
+
+                        }
+                    }
+
+
+            }catch(JSONException e)
+            {
+                Log.e("json error",e.toString());
+            }
+
+
+
+        }
+
+    }
+
+    class PeriodicBroadcast extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            String jsonResult = intent.getStringExtra("jsonresult");
+            MarkerOptions options = new MarkerOptions();
+
+
+            try {
+                JSONArray pilotparking = new JSONArray(jsonResult);
+                    Log.d("cool",jsonResult);
+                    for (int i = 0; i < pilotparking.length(); i++) {
+                        JSONObject e = pilotparking.getJSONObject(i);
+                        LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
+                        int color = e.getInt("color");
+                        options.position(point);
+                        options.title("someTitle");
+                        options.snippet("someDesc");
+                        options.icon(BitmapDescriptorFactory.defaultMarker(color));
+                        mMap.addMarker(options);
+                    }
+
+
+
+            } catch (JSONException e) {
+                System.out.print(e);
+            }
+        }
+    }
 }
