@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<<<<<<< HEAD
     <style name="markerOptions">
         <item name="android:paddingTop">15dp</item>
         <item name="android:paddingBottom">15dp</item>
@@ -17,4 +18,6 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+=======
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
 </resources>

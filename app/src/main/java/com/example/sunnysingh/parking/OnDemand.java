@@ -29,7 +29,10 @@ public class OnDemand extends IntentService{
     TimerTask doAsynchronousTask;
     final Handler handler = new Handler();
     Timer timer = new Timer();
+<<<<<<< HEAD
 
+=======
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     public OnDemand() {
         super("DownloadService");
         // TODO Auto-generated constructor stub
@@ -46,7 +49,11 @@ public class OnDemand extends IntentService{
 
                 RequestQueue rq = Volley.newRequestQueue(getBaseContext());
 
+<<<<<<< HEAD
                 String Url = url;//later url will be url+location
+=======
+                String Url = url;//later url will bee url+location
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
 
                 JsonArrayRequest jsonarrayreq = new JsonArrayRequest(Request.Method.GET,
                         Url, null,
@@ -54,7 +61,11 @@ public class OnDemand extends IntentService{
 
                             @Override
                             public void onResponse(JSONArray response) {
+<<<<<<< HEAD
                                 Log.d("response from server", ""/*response.toString()*/);
+=======
+                                Log.d("response", response.toString());
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
                                 sendResultBroadcast(response);
 
                             }
@@ -63,7 +74,11 @@ public class OnDemand extends IntentService{
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         VolleyLog.d("volley error", "Error: " + error.getMessage());
+<<<<<<< HEAD
                         Log.d("ERROR",error.toString());
+=======
+                        Log.d("EROOR",error.toString());
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
                         // hide the progress dialog
                     }
                 });
@@ -83,9 +98,16 @@ public class OnDemand extends IntentService{
 
 
     void sendResultBroadcast(JSONArray jsonResult) {
+<<<<<<< HEAD
 
         Intent in = new Intent();
         in.putExtra("jsonresult", jsonResult.toString());
+=======
+        Intent in = new Intent();
+
+        in.putExtra("jsonresult", jsonResult.toString());
+
+>>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         in.setAction("com.ram.CUSTOM_BROADCAST");
 
         sendBroadcast(in);
