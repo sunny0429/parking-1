@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.example.sunnysingh.parking.MapsActivity" />
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:maxLines="1"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:padding="10dp"
+            android:background="#98ffffff"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            android:hint="Please enter your place"
+            android:layout_toRightOf="@+id/back_btn" />
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="\u25c0--"
+            android:onClick="prompt"
+            android:background="@drawable/back_btn"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/base"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true">
+
+                <LinearLayout
+                    android:id="@+id/footer"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/footer_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="9">
+
+                        <TextView
+                            style="@style/markerOptions"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:text="@string/info_option"
+                            android:onClick="showDeets" />
+                        <!--android:drawableLeft="@android:drawable/ic_menu_info_details"-->
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginBottom="15dp"
+                            android:background="#000" />
+
+                        <TextView
+                            style="@style/markerOptions"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:text="@string/route_option"
+                            android:onClick="showRoute" />
+                        <!--android:drawableLeft="@android:drawable/ic_menu_directions"-->
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginBottom="15dp"
+                            android:background="#000" />
+
+                        <TextView
+                            style="@style/markerOptions"
+                            android:id="@+id/buttonCurrent"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:clickable="true"
+                            android:text="@string/nav_option"
+                            android:gravity="center" />
+                        <!--android:drawableLeft="@android:drawable/ic_menu_send" -->
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#666"
+                    android:layout_above="@+id/footer" />
+
+        </RelativeLayout>
+
+</RelativeLayout>

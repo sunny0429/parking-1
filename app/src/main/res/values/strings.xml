@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Parking</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="info_option">Info</string>
+    <string name="route_option">Route</string>
+    <string name="nav_option">Navigate</string>
+</resources>
