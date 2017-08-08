@@ -52,11 +52,7 @@ public class PeriodicService extends IntentService {
 
                                     @Override
                                     public void onResponse(JSONArray response) {
-<<<<<<< HEAD
-                                        Log.d("response", "received"/*response.toString()*/);
-=======
                                         Log.d("response", response.toString());
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
                                         sendResultBroadcast(response);
 
                                     }

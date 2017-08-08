@@ -1,27 +1,18 @@
 package com.example.sunnysingh.parking;
 
         import android.Manifest;
-<<<<<<< HEAD
-=======
         import android.app.IntentService;
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
         import android.content.IntentFilter;
         import android.content.pm.PackageManager;
-<<<<<<< HEAD
         import android.graphics.BitmapFactory;
-=======
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         import android.graphics.Color;
         import android.location.Address;
         import android.location.Geocoder;
         import android.location.Location;
-<<<<<<< HEAD
-=======
         import android.location.LocationListener;
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         import android.net.Uri;
         import android.os.AsyncTask;
         import android.os.Build;
@@ -30,7 +21,6 @@ package com.example.sunnysingh.parking;
         import android.os.Bundle;
         import android.support.v4.content.ContextCompat;
         import android.util.Log;
-<<<<<<< HEAD
         import android.view.KeyEvent;
         import android.view.View;
         import android.view.inputmethod.EditorInfo;
@@ -46,17 +36,6 @@ package com.example.sunnysingh.parking;
         import android.widget.Toast;
 
         import com.example.sunnysingh.parking.plotter.Plotter;
-=======
-        import android.view.View;
-        import android.widget.AdapterView;
-        import android.widget.ArrayAdapter;
-        import android.widget.AutoCompleteTextView;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.Filter;
-        import android.widget.Filterable;
-        import android.widget.Toast;
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         import com.google.android.gms.location.LocationServices;
 
         import com.google.android.gms.common.ConnectionResult;
@@ -67,11 +46,8 @@ package com.example.sunnysingh.parking;
         import com.google.android.gms.maps.OnMapReadyCallback;
         import com.google.android.gms.maps.SupportMapFragment;
         import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-<<<<<<< HEAD
         import com.google.android.gms.maps.model.GroundOverlay;
         import com.google.android.gms.maps.model.GroundOverlayOptions;
-=======
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         import com.google.android.gms.maps.model.LatLng;
         import com.google.android.gms.maps.model.Marker;
         import com.google.android.gms.maps.model.MarkerOptions;
@@ -101,7 +77,6 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerDragListener,
-<<<<<<< HEAD
         GoogleMap.OnMarkerClickListener,AdapterView.OnItemClickListener, Plotter.PlotterCallback {
 
 
@@ -115,15 +90,6 @@ public class MapsActivity extends FragmentActivity implements
     private Selected selected;
     private TextView currentButton;
     private RelativeLayout base;
-=======
-        GoogleMap.OnMarkerClickListener,AdapterView.OnItemClickListener {
-
-
-    //Our Map
-    private GoogleMap mMap;
-
-    private Button currentButton;
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     //To store longitude and latitude from map
     private double longitude;
     private double latitude;
@@ -131,17 +97,9 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap googleMap;
     ArrayList markerPoints = new ArrayList();
     private ArrayList<LatLng> latlngs = new ArrayList<>();
-<<<<<<< HEAD
     private static final String LOG_TAG = "Gpa";
     Polyline polylineFinal;
     private static int count = 0;
-=======
-   // JSONArray jsonArray = new JSONArray();
-    private Button search;
-    private static final String LOG_TAG = "Gpa";
-    Polyline polylineFinal;
-private static int count = 0;
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
     private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
     private static final String OUT_JSON = "/json";
@@ -157,15 +115,11 @@ private static int count = 0;
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-<<<<<<< HEAD
         mActivity = this;
-=======
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-<<<<<<< HEAD
         final AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
         autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
         autoCompView.setOnItemClickListener(this);
@@ -186,14 +140,6 @@ private static int count = 0;
                 return false;
             }
         });
-=======
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-
-
-        autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
-
-        autoCompView.setOnItemClickListener(this);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
 
         //Initializing googleapi client
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -201,141 +147,16 @@ private static int count = 0;
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-<<<<<<< HEAD
 
         base = findViewById(R.id.base);
         currentButton = (TextView)findViewById(R.id.buttonCurrent);
-=======
-        currentButton = findViewById(R.id.buttonCurrent);
-        search = findViewById(R.id.search);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         checkLocationPermission();
         registerReceiver(new OnDemandBroadcast(), new IntentFilter(
                 "com.ram.CUSTOM_BROADCAST"));
         registerReceiver(new PeriodicBroadcast(), new IntentFilter(
                 "com.ram.CUSTOM_BROADCAST2"));
-<<<<<<< HEAD
     }
 
-=======
-/// Array of JSON Objects for lat and long
-      /*  JSONObject parking2 = new JSONObject();
-        try {
-            parking2.put("latitude", 28.629964);
-            parking2.put("longitude", 77.436197);
-            parking2.put("color", 7);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        JSONObject parking1 = new JSONObject();
-        try {
-            parking1.put("latitude", 28.629881);
-            parking1.put("longitude", 77.436537);
-            parking1.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking3 = new JSONObject();
-        try {
-            parking3.put("latitude", 28.629798);
-            parking3.put("longitude", 77.437103);
-            parking3.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking4 = new JSONObject();
-        try {
-            parking4.put("latitude", 28.628191);
-            parking4.put("longitude", 77.440406);
-            parking4.put("color", 7);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking5 = new JSONObject();
-        try {
-            parking5.put("latitude", 28.628630);
-            parking5.put("longitude", 77.440708);
-            parking5.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking6 = new JSONObject();
-        try {
-            parking6.put("latitude", 28.629256);
-            parking6.put("longitude", 77.441085);
-            parking6.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking7 = new JSONObject();
-        try {
-            parking7.put("latitude", 28.629508);
-            parking7.put("longitude", 77.441224);
-            parking7.put("color", 7);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking8 = new JSONObject();
-        try {
-            parking8.put("latitude", 28.629315);
-            parking8.put("longitude", 77.440060);
-            parking8.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking9 = new JSONObject();
-        try {
-            parking9.put("latitude", 28.629291);
-            parking9.put("longitude", 77.440178);
-            parking9.put("color", 7);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JSONObject parking10 = new JSONObject();
-        try {
-            parking10.put("latitude", 28.629207);
-            parking10.put("longitude", 77.440500);
-            parking10.put("color", 138);
-
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        jsonArray.put(parking1);
-        jsonArray.put(parking2);
-        jsonArray.put(parking3);
-        jsonArray.put(parking4);
-        jsonArray.put(parking5);
-        jsonArray.put(parking6);
-        jsonArray.put(parking7);
-        jsonArray.put(parking8);
-        jsonArray.put(parking9);
-        jsonArray.put(parking10);
-///////////////////////////////////////////////
-    }
-*/
-    }
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     @Override
     protected void onStart() {
         googleApiClient.connect();
@@ -349,11 +170,7 @@ private static int count = 0;
     }
 
     //Getting current location
-<<<<<<< HEAD
     private void getCurrentLocation(boolean _moveMap) {
-=======
-    private void getCurrentLocation() {
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         mMap.clear();
         //Creating a location object
         try {
@@ -364,28 +181,17 @@ private static int count = 0;
                 latitude = location.getLatitude();
 
                 //moving the map to location
-<<<<<<< HEAD
                 moveMap(_moveMap);
             }else{
                 Log.e("Location returned", "null");
             }
         } catch (SecurityException e) {
             Log.e("error", "couldn't add location", e);
-=======
-                moveMap();
-            }
-        } catch (SecurityException e) {
-            Log.d("error", "", e);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         }
     }
 
     //Function to move the map
-<<<<<<< HEAD
     private void moveMap(boolean move) {
-=======
-    private void moveMap() {
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         //String to display current latitude and longitude
         String msg = latitude + ", " + longitude;
 
@@ -401,7 +207,6 @@ private static int count = 0;
                 .setIcon(BitmapDescriptorFactory.defaultMarker(210));
         latlngs.add(new LatLng(latitude, longitude));
 
-<<<<<<< HEAD
         if (move) {
             //Moving and animating the camera
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
@@ -409,16 +214,6 @@ private static int count = 0;
 
         markerPoints.add(latLng);
 
-=======
-        //Moving the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
-        //Animating the camera
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-        markerPoints.add(latLng);
-
-
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     }
 
     @Override
@@ -431,11 +226,7 @@ private static int count = 0;
 
     @Override
     public void onConnected(Bundle bundle) {
-<<<<<<< HEAD
         getCurrentLocation(true);
-=======
-        getCurrentLocation();
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         Log.d("cool","");
         Intent demandservice = new Intent(getApplicationContext(),
                 OnDemand.class);
@@ -444,7 +235,6 @@ private static int count = 0;
         startService(demandservice);
         Log.d("demand service started","");
         Intent periodicservice = new Intent(getApplicationContext(),
-<<<<<<< HEAD
                 PeriodicService.class);
         startService(periodicservice);
     }
@@ -473,62 +263,6 @@ private static int count = 0;
         }
 
         //What does this piece of code do
-=======
-         PeriodicService.class);
-        startService(periodicservice);
-        //Log.d("periodic started","");
-
-        // Adding new item to the ArrayList
-        /*MarkerOptions options = new MarkerOptions();
-        try {
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject e = jsonArray.getJSONObject(i);
-                LatLng point =  new LatLng(e.getDouble("latitude"),e.getDouble("longitude"));
-                int color = e.getInt("color");
-            options.position(point);
-            options.title("someTitle");
-            options.snippet("someDesc");
-            options.icon(BitmapDescriptorFactory.defaultMarker(color));
-            mMap.addMarker(options);
-                // start on demand service to get nearby parking slot
-                // start periodic service
-
-        }
-        }catch(JSONException e) {
-            e.printStackTrace();
-        }
-*/
-           }
-    @Override
-    public boolean onMarkerClick(final Marker marker) {
-       // mMap.clear();
-        //getCurrentLocation();
-// here we have to handle 3 cases that is marker click action of current parking lots, marker click action of 10 lots and of searched lots
-        /*
-        MarkerOptions options = new MarkerOptions();
-        try {
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject e = jsonArray.getJSONObject(i);
-                LatLng point =  new LatLng(e.getDouble("latitude"),e.getDouble("longitude"));
-                int color = e.getInt("color");
-                options.position(point);
-                options.title("someTitle");
-                options.snippet("someDesc");
-                options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                mMap.addMarker(options);
-
-            }
-        }catch(JSONException e) {
-            e.printStackTrace();
-        }*/
-
-            LatLng origin = latlngs.get(0);
-            final LatLng dest = marker.getPosition();
-
-            // Getting URL to the Google Directions API
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         if(count==0)
         {
             count++;
@@ -536,7 +270,6 @@ private static int count = 0;
         else if(count==1) {
             polylineFinal.remove();
         }
-<<<<<<< HEAD
         //-------------------------------
 
         // Getting URL to the Google Directions API
@@ -545,15 +278,6 @@ private static int count = 0;
 
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
-=======
-        String url = getDirectionsUrl(origin, dest);
-
-            DownloadTask downloadTask = new DownloadTask();
-
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
-            currentButton.setVisibility(View.VISIBLE);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         currentButton.setOnClickListener( new View.OnClickListener() {
 
             @Override
@@ -564,7 +288,6 @@ private static int count = 0;
                 startActivity(intent);
             }
         });
-<<<<<<< HEAD
     }
 
     @Override
@@ -575,10 +298,6 @@ private static int count = 0;
         return true;
     }
 
-=======
-        return true;
-    }
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -601,11 +320,7 @@ private static int count = 0;
     }
 
 
-<<<<<<< HEAD
     public void onMapSearch(View view) {
-=======
-   public void onMapSearch(View view) {
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         AutoCompleteTextView locationSearch = findViewById(R.id.autoCompleteTextView);
         String location = locationSearch.getText().toString();
         List<Address> addressList = null;
@@ -618,10 +333,7 @@ private static int count = 0;
             } catch (IOException e) {
                 e.printStackTrace();
             }
-<<<<<<< HEAD
             //mMap.clear();
-=======
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
             Address address = addressList.get(0);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             Intent demandservice = new Intent(getApplicationContext(),
@@ -631,19 +343,12 @@ private static int count = 0;
             startService(demandservice);
 
             // start on demand service and get searched parking lots
-<<<<<<< HEAD
             /*mMap.addMarker(new MarkerOptions().position(latLng).title("Search result")
                     .snippet("This is a placeholder snippet for the marker returned from the search"));*/
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
     }
 
-=======
-            //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        }
-    }
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     @Override
     public void onMarkerDragEnd(Marker marker) {
         //Getting the coordinates
@@ -651,11 +356,7 @@ private static int count = 0;
         longitude = marker.getPosition().longitude;
 
         //Moving the map
-<<<<<<< HEAD
         moveMap(true);
-=======
-        moveMap();
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     }
 
 
@@ -730,7 +431,6 @@ private static int count = 0;
         }
     }
 
-<<<<<<< HEAD
     @Override
     public void onOverlayClicked(GroundOverlay overlay) {
         //handle overlay click
@@ -740,9 +440,6 @@ private static int count = 0;
     }
 
     /// the below code gets route between selected markers
-=======
-/// the below code gets route between selected markers
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -763,11 +460,6 @@ private static int count = 0;
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
-<<<<<<< HEAD
-=======
-
-
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
             parserTask.execute(result);
 
         }
@@ -789,13 +481,8 @@ private static int count = 0;
             try {
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-<<<<<<< HEAD
                 routes = parser.parse(jObject);
 
-=======
-
-                routes = parser.parse(jObject);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -901,7 +588,6 @@ private static int count = 0;
 
     // below code is the auto search completion
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-<<<<<<< HEAD
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         if (imm.isAcceptingText()) {
@@ -911,10 +597,6 @@ private static int count = 0;
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
         onMapSearch(view);
         //hide the keyboard
-=======
-        String str = (String) adapterView.getItemAtPosition(position);
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
     }
 
     public static ArrayList<String> autocomplete(String input) {
@@ -930,11 +612,7 @@ private static int count = 0;
 
             URL url = new URL(sb.toString());
 
-<<<<<<< HEAD
-//            System.out.println("URL: "+url);
-=======
             System.out.println("URL: "+url);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
             conn = (HttpURLConnection) url.openConnection();
             InputStreamReader in = new InputStreamReader(conn.getInputStream());
 
@@ -965,13 +643,8 @@ private static int count = 0;
             // Extract the Place descriptions from the results
             resultList = new ArrayList<String>(predsJsonArray.length());
             for (int i = 0; i < predsJsonArray.length(); i++) {
-<<<<<<< HEAD
-//                System.out.println(predsJsonArray.getJSONObject(i).getString("description"));
-//                System.out.println("============================================================");
-=======
                 System.out.println(predsJsonArray.getJSONObject(i).getString("description"));
                 System.out.println("============================================================");
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
                 resultList.add(predsJsonArray.getJSONObject(i).getString("description"));
             }
         } catch (JSONException e) {
@@ -1040,10 +713,7 @@ private static int count = 0;
 
             try {
                 JSONArray array = new JSONArray(jsonResult);
-<<<<<<< HEAD
                 Log.e("Decoding", "json array, size("+array.length()+") from intent");
-=======
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
                 if (array.getJSONObject(0).get("id").equals("current")) {
                     for (int i = 1; i < array.length(); i++) {
                         JSONObject e = array.getJSONObject(i);
@@ -1088,7 +758,6 @@ private static int count = 0;
         @Override
         public void onReceive(Context context, Intent intent) {
 
-<<<<<<< HEAD
             String jsonResult = intent.getStringExtra("jsonresult");
 //            MarkerOptions options = new MarkerOptions();
 //            GroundOverlayOptions overlay = new GroundOverlayOptions();
@@ -1104,56 +773,7 @@ private static int count = 0;
                     .plotArrayAvg(jsonResult);
 
 
-           /* try {
-                JSONArray pilotparking = new JSONArray(jsonResult);
-                    Log.d("cool","jsonResult"*//*jsonResult*//*);
-=======
 
-            String jsonResult = intent.getStringExtra("jsonresult");
-            MarkerOptions options = new MarkerOptions();
-
-
-            try {
-                JSONArray pilotparking = new JSONArray(jsonResult);
-                    Log.d("cool",jsonResult);
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
-                    for (int i = 0; i < pilotparking.length(); i++) {
-                        JSONObject e = pilotparking.getJSONObject(i);
-                        LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
-                        int color = e.getInt("color");
-<<<<<<< HEAD
-                        options.position(point)
-                                .title("someTitle")
-                                .snippet("someDesc");
-                        overlay.position(point, 17.45f,12.35f);
-                        if(color>50) {
-                            options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                            overlay.image(BitmapDescriptorFactory.fromResource(R.drawable.spot_available));
-                        }else{
-                            options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                            overlay.image(BitmapDescriptorFactory.fromResource(R.drawable.spot_occupied));
-                        }
-                        mMap.addGroundOverlay(overlay);
-                        mMap.addMarker(options);
-                    }
-
-            } catch (JSONException e) {
-                System.out.print(e);
-            }*/
-=======
-                        options.position(point);
-                        options.title("someTitle");
-                        options.snippet("someDesc");
-                        options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                        mMap.addMarker(options);
-                    }
-
-
-
-            } catch (JSONException e) {
-                System.out.print(e);
-            }
->>>>>>> a4c043476740df5a28105b5ba2c61a61d5fb392d
         }
     }
 }
