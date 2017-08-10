@@ -41,7 +41,7 @@ public class OnDemand extends IntentService{
 
         handler.post(new Runnable() {
             public void run() {
-                String location =  intent.getStringExtra("location");
+                //String location =  intent.getStringExtra("location");
                 String url =  intent.getStringExtra("url");
 
                 RequestQueue rq = Volley.newRequestQueue(getBaseContext());
@@ -54,7 +54,7 @@ public class OnDemand extends IntentService{
 
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.d("response from server", ""/*response.toString()*/);
+                                Log.e("response from server", response.toString());
                                 sendResultBroadcast(response);
 
                             }

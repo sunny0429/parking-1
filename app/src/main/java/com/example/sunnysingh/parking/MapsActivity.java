@@ -1,18 +1,15 @@
 package com.example.sunnysingh.parking;
 
         import android.Manifest;
-        import android.app.IntentService;
         import android.content.BroadcastReceiver;
         import android.content.Context;
         import android.content.Intent;
         import android.content.IntentFilter;
         import android.content.pm.PackageManager;
-        import android.graphics.BitmapFactory;
         import android.graphics.Color;
         import android.location.Address;
         import android.location.Geocoder;
         import android.location.Location;
-        import android.location.LocationListener;
         import android.net.Uri;
         import android.os.AsyncTask;
         import android.os.Build;
@@ -30,7 +27,6 @@ package com.example.sunnysingh.parking;
         import android.widget.AutoCompleteTextView;
         import android.widget.Filter;
         import android.widget.Filterable;
-        import android.widget.LinearLayout;
         import android.widget.RelativeLayout;
         import android.widget.TextView;
         import android.widget.Toast;
@@ -47,7 +43,6 @@ package com.example.sunnysingh.parking;
         import com.google.android.gms.maps.SupportMapFragment;
         import com.google.android.gms.maps.model.BitmapDescriptorFactory;
         import com.google.android.gms.maps.model.GroundOverlay;
-        import com.google.android.gms.maps.model.GroundOverlayOptions;
         import com.google.android.gms.maps.model.LatLng;
         import com.google.android.gms.maps.model.Marker;
         import com.google.android.gms.maps.model.MarkerOptions;
@@ -151,21 +146,24 @@ public class MapsActivity extends FragmentActivity implements
         base = findViewById(R.id.base);
         currentButton = (TextView)findViewById(R.id.buttonCurrent);
         checkLocationPermission();
-        registerReceiver(new OnDemandBroadcast(), new IntentFilter(
-                "com.ram.CUSTOM_BROADCAST"));
-        registerReceiver(new PeriodicBroadcast(), new IntentFilter(
-                "com.ram.CUSTOM_BROADCAST2"));
+
     }
 
     @Override
     protected void onStart() {
         googleApiClient.connect();
+        registerReceiver(PeriodicBrodcast, new IntentFilter(
+                "com.ram.CUSTOM_BROADCAST2"));
+        registerReceiver(DemandBrodcast, new IntentFilter(
+                "com.ram.CUSTOM_BROADCAST"));
+
         super.onStart();
     }
 
     @Override
     protected void onStop() {
         googleApiClient.disconnect();
+
         super.onStop();
     }
 
@@ -228,9 +226,9 @@ public class MapsActivity extends FragmentActivity implements
     public void onConnected(Bundle bundle) {
         getCurrentLocation(true);
         Log.d("cool","");
-        Intent demandservice = new Intent(getApplicationContext(),
+       Intent demandservice = new Intent(getApplicationContext(),
                 OnDemand.class);
-        //demandservice.putExtra("location",latlngs.get(0));
+       // demandservice.putExtra("location",latlngs.get(0));
         demandservice.putExtra("url",mycurrentlocationurl);
         startService(demandservice);
         Log.d("demand service started","");
@@ -701,63 +699,10 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    class OnDemandBroadcast extends BroadcastReceiver {
 
+    private BroadcastReceiver PeriodicBrodcast = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-            String jsonResult = intent.getStringExtra("jsonresult");
-            MarkerOptions options = new MarkerOptions();
-
-
-            try {
-                JSONArray array = new JSONArray(jsonResult);
-                Log.e("Decoding", "json array, size("+array.length()+") from intent");
-                if (array.getJSONObject(0).get("id").equals("current")) {
-                    for (int i = 1; i < array.length(); i++) {
-                        JSONObject e = array.getJSONObject(i);
-                        LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
-                        int color = e.getInt("color");
-                        options.position(point);
-                        options.title("someTitle");
-                        options.snippet("someDesc");
-                        options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                        mMap.addMarker(options);
-
-                    }
-                }
-                    if (array.getJSONObject(0).get("id").equals("searched")) {
-                        for (int i = 1; i < array.length(); i++) {
-                            JSONObject e = array.getJSONObject(i);
-                            LatLng point = new LatLng(e.getDouble("latitude"), e.getDouble("longitude"));
-                            int color = e.getInt("color");
-                            options.position(point);
-                            options.title("someTitle");
-                            options.snippet("someDesc");
-                            options.icon(BitmapDescriptorFactory.defaultMarker(color));
-                            mMap.addMarker(options);
-
-                        }
-                    }
-
-
-            }catch(JSONException e)
-            {
-                Log.e("json error",e.toString());
-            }
-
-
-
-        }
-
-    }
-
-    class PeriodicBroadcast extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
+        public void onReceive(Context arg0, Intent intent) {
             String jsonResult = intent.getStringExtra("jsonresult");
 //            MarkerOptions options = new MarkerOptions();
 //            GroundOverlayOptions overlay = new GroundOverlayOptions();
@@ -771,9 +716,34 @@ public class MapsActivity extends FragmentActivity implements
                     .initialiseWith(mMap)
                     .addOverlayClickListener(mActivity)
                     .plotArrayAvg(jsonResult);
-
-
-
         }
-    }
+
+    };
+    private BroadcastReceiver DemandBrodcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            String jsonResult = intent.getStringExtra("jsonresult");
+            Log.e("",jsonResult);
+            Plotter.getInstance(mActivity)
+                    .initialiseWith(mMap)
+                    .addOverlayClickListener(mActivity)
+                    .plotArrayAvg2(jsonResult);
+        }
+
+    };
+
+@Override
+    public void onPause(){
+    Plotter.getInstance(mActivity).cleardata();
+    Log.e("done","deleted");
+    mActivity.unregisterReceiver(PeriodicBrodcast);
+    mActivity.unregisterReceiver(DemandBrodcast);
+
+    super.onPause();
+}
+    /*@Override
+    public void onBackPressed(){
+
+        super.onBackPressed();
+    }*/
 }
