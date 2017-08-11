@@ -6,6 +6,7 @@ package com.example.sunnysingh.parking;
         import android.content.Intent;
         import android.content.IntentFilter;
         import android.content.pm.PackageManager;
+        import android.content.res.Resources;
         import android.graphics.Color;
         import android.location.Address;
         import android.location.Geocoder;
@@ -42,8 +43,11 @@ package com.example.sunnysingh.parking;
         import com.google.android.gms.maps.OnMapReadyCallback;
         import com.google.android.gms.maps.SupportMapFragment;
         import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+        import com.google.android.gms.maps.model.Circle;
+        import com.google.android.gms.maps.model.CircleOptions;
         import com.google.android.gms.maps.model.GroundOverlay;
         import com.google.android.gms.maps.model.LatLng;
+        import com.google.android.gms.maps.model.MapStyleOptions;
         import com.google.android.gms.maps.model.Marker;
         import com.google.android.gms.maps.model.MarkerOptions;
         import com.google.android.gms.maps.model.Polyline;
@@ -93,12 +97,14 @@ public class MapsActivity extends FragmentActivity implements
     ArrayList markerPoints = new ArrayList();
     private ArrayList<LatLng> latlngs = new ArrayList<>();
     private static final String LOG_TAG = "Gpa";
-    Polyline polylineFinal;
+    Polyline polylineFinal = null;
     private static int count = 0;
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
     private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
     private static final String OUT_JSON = "/json";
-
+    private static final String TAG = MapsActivity.class.getSimpleName();
+    private Circle mCircle;
+    private Marker mMarker;
     private static final String API_KEY = "AIzaSyCa-1vbasAKg3JFn2J79KiG8qOGG_Q-RH0";
     private static final String mycurrentlocationurl = "https://intense-refuge-23593.herokuapp.com/cool";
     private static final String searchurl = "https://intense-refuge-23593.herokuapp.com/dlf";
@@ -110,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
+
         mActivity = this;
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -198,12 +205,12 @@ public class MapsActivity extends FragmentActivity implements
         LatLng latLng = new LatLng(latitude, longitude);
         latlngs.clear();
         //Adding marker to map
-        mMap.addMarker(new MarkerOptions()
+        /*mMap.addMarker(new MarkerOptions()
                 .position(latLng) //setting position
                 .draggable(true) //Making the marker draggable
                 .title("Current Location")) //Adding a title
                 .setIcon(BitmapDescriptorFactory.defaultMarker(210));
-        latlngs.add(new LatLng(latitude, longitude));
+        */latlngs.add(new LatLng(latitude, longitude));
 
         if (move) {
             //Moving and animating the camera
@@ -211,11 +218,29 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         markerPoints.add(latLng);
+        //drawMarkerWithCircle(latLng);
+
+addCircleWithConstantSize(latLng);
 
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+        googleMap.setBuildingsEnabled(false);
+
         mMap = googleMap;
         mMap.setOnMarkerDragListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -249,43 +274,70 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     public void showRoute(View view){
-        LatLng origin = latlngs.get(0);
-        final LatLng dest;
-        if (selected == Selected.MARKER)
-            dest = viewMarker.getPosition();
-        else
-            dest = viewOverlay.getPosition();
-        if (origin.latitude == dest.latitude && origin.longitude == dest.longitude){
-            Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
-            return ;
+if(polylineFinal==null) {
+    LatLng origin = latlngs.get(0);
+    final LatLng dest;
+    if (selected == Selected.MARKER)
+        dest = viewMarker.getPosition();
+    else
+        dest = viewOverlay.getPosition();
+    if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
+        Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    //What does this piece of code do
+    //-------------------------------
+
+    // Getting URL to the Google Directions API
+    String url = getDirectionsUrl(origin, dest);
+    DownloadTask downloadTask = new DownloadTask();
+
+    // Start downloading json data from Google Directions API
+    downloadTask.execute(url);
+    currentButton.setOnClickListener(new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            startActivity(intent);
         }
+    });
+}else{
+    polylineFinal.remove();
+    LatLng origin = latlngs.get(0);
+    final LatLng dest;
+    if (selected == Selected.MARKER)
+        dest = viewMarker.getPosition();
+    else
+        dest = viewOverlay.getPosition();
+    if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
+        Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
+        return;
+    }
 
-        //What does this piece of code do
-        if(count==0)
-        {
-            count++;
+    //What does this piece of code do
+    //-------------------------------
+
+    // Getting URL to the Google Directions API
+    String url = getDirectionsUrl(origin, dest);
+    DownloadTask downloadTask = new DownloadTask();
+
+    // Start downloading json data from Google Directions API
+    downloadTask.execute(url);
+    currentButton.setOnClickListener(new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            startActivity(intent);
         }
-        else if(count==1) {
-            polylineFinal.remove();
-        }
-        //-------------------------------
-
-        // Getting URL to the Google Directions API
-        String url = getDirectionsUrl(origin, dest);
-        DownloadTask downloadTask = new DownloadTask();
-
-        // Start downloading json data from Google Directions API
-        downloadTask.execute(url);
-        currentButton.setOnClickListener( new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                intent.setPackage("com.google.android.apps.maps");
-                startActivity(intent);
-            }
-        });
+    });
+}
     }
 
     @Override
@@ -293,6 +345,7 @@ public class MapsActivity extends FragmentActivity implements
         selected = Selected.MARKER;
         viewMarker = marker;
         base.setVisibility(View.VISIBLE);
+
         return true;
     }
 
@@ -434,6 +487,13 @@ public class MapsActivity extends FragmentActivity implements
         //handle overlay click
         selected = Selected.OVERLAY;
         viewOverlay = overlay;
+
+         if(polylineFinal!=null) {
+             Log.e("polyline","cleared");
+            polylineFinal.remove();
+             polylineFinal=null;
+        }
+
         base.setVisibility(View.VISIBLE);
     }
 
@@ -511,13 +571,17 @@ public class MapsActivity extends FragmentActivity implements
 
                 lineOptions.addAll(points);
                 lineOptions.width(15);
-                lineOptions.color(Color.BLACK);
+                lineOptions.color(Color.parseColor("#006064"));
                 lineOptions.geodesic(true);
 
             }
 
 // Drawing polyline in the Google Map for the i-th route
-             polylineFinal = mMap.addPolyline(lineOptions);
+            if(lineOptions==null) {
+                Toast.makeText(mActivity,"Reselect Parking Lot",Toast.LENGTH_SHORT).show();
+            }else {
+                polylineFinal = mMap.addPolyline(lineOptions);
+            }
         }
     }
 
@@ -746,4 +810,42 @@ public class MapsActivity extends FragmentActivity implements
 
         super.onBackPressed();
     }*/
+
+
+
+    public static double calculateCircleRadiusMeterForMapCircle(final int _targetRadiusDip, final double _circleCenterLatitude,
+                                                                final float _currentMapZoom) {
+        //That base value seems to work for computing the meter length of a DIP
+        final double arbitraryValueForDip = 136000D;
+        final double oneDipDistance = Math.abs(Math.cos(Math.toRadians(_circleCenterLatitude))) * arbitraryValueForDip / Math.pow(2, _currentMapZoom);
+        return oneDipDistance * (double) _targetRadiusDip;
+    }
+
+    public void addCircleWithConstantSize(LatLng position){
+        //Retrieve your GoogleMap object here
+        int strokeColor = Color.parseColor("#ffffff"); //red outline
+        int shadeColor = Color.parseColor("#2962ff"); //opaque red fill
+        int outershadeColor = Color.parseColor("#552962ff"); //opaque red fill
+
+        //Creating a circle for the example
+        final CircleOptions co = new CircleOptions();
+        final CircleOptions outerco = new CircleOptions();
+        co.center(position);
+co.zIndex(0.5f).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(5);
+        outerco.center(position).zIndex(0.2f).fillColor(outershadeColor).strokeWidth(0);
+
+        final Circle circles = mMap.addCircle(co);
+        final Circle outercircles = mMap.addCircle(outerco);
+        outercircles.setRadius(20);
+        //Setting a listener on the map camera to monitor when the camera changes
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                //Use the function to calculate the radius
+                final double radius = calculateCircleRadiusMeterForMapCircle(10, co.getCenter().latitude, mMap.getCameraPosition().zoom);
+                //Apply the radius to the circle
+                circles.setRadius(radius);
+            }
+        });
+    }
 }
