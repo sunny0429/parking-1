@@ -1,74 +1,76 @@
 package com.example.sunnysingh.parking;
 
-        import android.Manifest;
-        import android.content.BroadcastReceiver;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.content.IntentFilter;
-        import android.content.pm.PackageManager;
-        import android.content.res.Resources;
-        import android.graphics.Color;
-        import android.location.Address;
-        import android.location.Geocoder;
-        import android.location.Location;
-        import android.net.Uri;
-        import android.os.AsyncTask;
-        import android.os.Build;
-        import android.support.v4.app.ActivityCompat;
-        import android.support.v4.app.FragmentActivity;
-        import android.os.Bundle;
-        import android.support.v4.content.ContextCompat;
-        import android.util.Log;
-        import android.view.KeyEvent;
-        import android.view.View;
-        import android.view.inputmethod.EditorInfo;
-        import android.view.inputmethod.InputMethodManager;
-        import android.widget.AdapterView;
-        import android.widget.ArrayAdapter;
-        import android.widget.AutoCompleteTextView;
-        import android.widget.Filter;
-        import android.widget.Filterable;
-        import android.widget.RelativeLayout;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-        import com.example.sunnysingh.parking.plotter.Plotter;
-        import com.google.android.gms.location.LocationServices;
+import com.example.sunnysingh.parking.plotter.Plotter;
+import com.google.android.gms.location.LocationServices;
 
-        import com.google.android.gms.common.ConnectionResult;
-        import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
-        import com.google.android.gms.maps.CameraUpdateFactory;
-        import com.google.android.gms.maps.GoogleMap;
-        import com.google.android.gms.maps.OnMapReadyCallback;
-        import com.google.android.gms.maps.SupportMapFragment;
-        import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-        import com.google.android.gms.maps.model.Circle;
-        import com.google.android.gms.maps.model.CircleOptions;
-        import com.google.android.gms.maps.model.GroundOverlay;
-        import com.google.android.gms.maps.model.LatLng;
-        import com.google.android.gms.maps.model.MapStyleOptions;
-        import com.google.android.gms.maps.model.Marker;
-        import com.google.android.gms.maps.model.MarkerOptions;
-        import com.google.android.gms.maps.model.Polyline;
-        import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-        import org.json.JSONArray;
-        import org.json.JSONException;
-        import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-        import java.io.BufferedReader;
-        import java.io.IOException;
-        import java.io.InputStream;
-        import java.io.InputStreamReader;
-        import java.net.HttpURLConnection;
-        import java.net.MalformedURLException;
-        import java.net.URL;
-        import java.net.URLEncoder;
-        import java.util.ArrayList;
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Locale;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MapsActivity extends FragmentActivity implements
@@ -94,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements
     private double latitude;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
+    private AlertDialog dialog;
     ArrayList markerPoints = new ArrayList();
     private ArrayList<LatLng> latlngs = new ArrayList<>();
     private static final String LOG_TAG = "Gpa";
@@ -220,7 +223,7 @@ public class MapsActivity extends FragmentActivity implements
         markerPoints.add(latLng);
         //drawMarkerWithCircle(latLng);
 
-addCircleWithConstantSize(latLng);
+        addCircleWithConstantSize(latLng);
 
     }
 
@@ -251,9 +254,9 @@ addCircleWithConstantSize(latLng);
     public void onConnected(Bundle bundle) {
         getCurrentLocation(true);
         Log.d("cool","");
-       Intent demandservice = new Intent(getApplicationContext(),
+        Intent demandservice = new Intent(getApplicationContext(),
                 OnDemand.class);
-       // demandservice.putExtra("location",latlngs.get(0));
+        // demandservice.putExtra("location",latlngs.get(0));
         demandservice.putExtra("url",mycurrentlocationurl);
         startService(demandservice);
         Log.d("demand service started","");
@@ -274,70 +277,85 @@ addCircleWithConstantSize(latLng);
     }
 
     public void showRoute(View view){
-if(polylineFinal==null) {
-    LatLng origin = latlngs.get(0);
-    final LatLng dest;
-    if (selected == Selected.MARKER)
-        dest = viewMarker.getPosition();
-    else
-        dest = viewOverlay.getPosition();
-    if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
-        Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
-        return;
-    }
+        if(polylineFinal==null) {
+            LatLng origin = latlngs.get(0);
+            final LatLng dest;
+            if (selected == Selected.MARKER)
+                dest = viewMarker.getPosition();
+            else
+                dest = viewOverlay.getPosition();
+            if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
+                Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-    //What does this piece of code do
-    //-------------------------------
+            //What does this piece of code do
+            //-------------------------------
 
-    // Getting URL to the Google Directions API
-    String url = getDirectionsUrl(origin, dest);
-    DownloadTask downloadTask = new DownloadTask();
+            // Getting URL to the Google Directions API
+            String url = getDirectionsUrl(origin, dest);
+            DownloadTask downloadTask = new DownloadTask();
 
-    // Start downloading json data from Google Directions API
-    downloadTask.execute(url);
-    currentButton.setOnClickListener(new View.OnClickListener() {
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+            currentButton.setOnClickListener(new View.OnClickListener() {
 
-        @Override
-        public void onClick(View v) {
-            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-            intent.setPackage("com.google.android.apps.maps");
-            startActivity(intent);
+                @Override
+                public void onClick(View v) {
+                    String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    intent.setPackage("com.google.android.apps.maps");
+                    startActivity(intent);
+                }
+            });
+        }else{
+            polylineFinal.remove();
+            LatLng origin = latlngs.get(0);
+            final LatLng dest;
+            if (selected == Selected.MARKER)
+                dest = viewMarker.getPosition();
+            else
+                dest = viewOverlay.getPosition();
+            if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
+                Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            //What does this piece of code do
+            //-------------------------------
+
+            // Getting URL to the Google Directions API
+            String url = getDirectionsUrl(origin, dest);
+            DownloadTask downloadTask = new DownloadTask();
+
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+            currentButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    dialog = new AlertDialog.Builder(mActivity/*, R.layout.dialog_book*/).setCancelable(false).setPositiveButton("Book", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialog.cancel();
+                            Toast.makeText(mActivity, "Very well, navigating you to your spot", Toast.LENGTH_SHORT).show();
+                            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                            intent.setPackage("com.google.android.apps.maps");
+                            startActivity(intent);
+                        }
+                    }).setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialog.cancel();
+                        }
+                    }).setTitle("Confirm booking")
+                            .setMessage("Let's take you to this parking spot, but first choose a payment menthod").create();
+                    dialog.show();
+
+                }
+            });
         }
-    });
-}else{
-    polylineFinal.remove();
-    LatLng origin = latlngs.get(0);
-    final LatLng dest;
-    if (selected == Selected.MARKER)
-        dest = viewMarker.getPosition();
-    else
-        dest = viewOverlay.getPosition();
-    if (origin.latitude == dest.latitude && origin.longitude == dest.longitude) {
-        Toast.makeText(this, "You're at your destination", Toast.LENGTH_SHORT).show();
-        return;
-    }
-
-    //What does this piece of code do
-    //-------------------------------
-
-    // Getting URL to the Google Directions API
-    String url = getDirectionsUrl(origin, dest);
-    DownloadTask downloadTask = new DownloadTask();
-
-    // Start downloading json data from Google Directions API
-    downloadTask.execute(url);
-    currentButton.setOnClickListener(new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-            intent.setPackage("com.google.android.apps.maps");
-            startActivity(intent);
-        }
-    });
-}
     }
 
     @Override
@@ -389,7 +407,7 @@ if(polylineFinal==null) {
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             Intent demandservice = new Intent(getApplicationContext(),
                     OnDemand.class);
-           // demandservice.putExtra("location",addressList.get(0));
+            // demandservice.putExtra("location",addressList.get(0));
             demandservice.putExtra("url",searchurl);
             startService(demandservice);
 
@@ -488,10 +506,10 @@ if(polylineFinal==null) {
         selected = Selected.OVERLAY;
         viewOverlay = overlay;
 
-         if(polylineFinal!=null) {
-             Log.e("polyline","cleared");
+        if(polylineFinal!=null) {
+            Log.e("polyline","cleared");
             polylineFinal.remove();
-             polylineFinal=null;
+            polylineFinal=null;
         }
 
         base.setVisibility(View.VISIBLE);
@@ -796,15 +814,15 @@ if(polylineFinal==null) {
 
     };
 
-@Override
+    @Override
     public void onPause(){
-    Plotter.getInstance(mActivity).cleardata();
-    Log.e("done","deleted");
-    mActivity.unregisterReceiver(PeriodicBrodcast);
-    mActivity.unregisterReceiver(DemandBrodcast);
+        Plotter.getInstance(mActivity).cleardata();
+        Log.e("done","deleted");
+        mActivity.unregisterReceiver(PeriodicBrodcast);
+        mActivity.unregisterReceiver(DemandBrodcast);
 
-    super.onPause();
-}
+        super.onPause();
+    }
     /*@Override
     public void onBackPressed(){
 
@@ -831,7 +849,7 @@ if(polylineFinal==null) {
         final CircleOptions co = new CircleOptions();
         final CircleOptions outerco = new CircleOptions();
         co.center(position);
-co.zIndex(0.5f).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(5);
+        co.zIndex(0.5f).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(5);
         outerco.center(position).zIndex(0.2f).fillColor(outershadeColor).strokeWidth(0);
 
         final Circle circles = mMap.addCircle(co);
