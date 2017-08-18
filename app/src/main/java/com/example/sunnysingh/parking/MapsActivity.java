@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,8 +22,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -266,7 +272,10 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     public void prompt(View view){
-        Toast.makeText(this, "This will lead back to HomeScreen, when added", Toast.LENGTH_SHORT).show();
+        getSharedPreferences(LoginActivity.MyLOGINPREFERENCES, MODE_PRIVATE)
+                .edit().putString(LoginActivity.UserType, "")
+                .commit();
+        onBackPressed();
     }
 
     public void showDeets(View view){
@@ -277,6 +286,7 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     public void showRoute(View view){
+        if (!currentButton.isEnabled()) currentButton.setEnabled(true);
         if(polylineFinal==null) {
             LatLng origin = latlngs.get(0);
             final LatLng dest;
@@ -289,9 +299,6 @@ public class MapsActivity extends FragmentActivity implements
                 return;
             }
 
-            //What does this piece of code do
-            //-------------------------------
-
             // Getting URL to the Google Directions API
             String url = getDirectionsUrl(origin, dest);
             DownloadTask downloadTask = new DownloadTask();
@@ -299,15 +306,10 @@ public class MapsActivity extends FragmentActivity implements
             // Start downloading json data from Google Directions API
             downloadTask.execute(url);
             currentButton.setOnClickListener(new View.OnClickListener() {
-
                 @Override
-                public void onClick(View v) {
-                    String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                    intent.setPackage("com.google.android.apps.maps");
-                    startActivity(intent);
-                }
+                public void onClick(View v) {   showDialog(dest);   }
             });
+
         }else{
             polylineFinal.remove();
             LatLng origin = latlngs.get(0);
@@ -321,41 +323,54 @@ public class MapsActivity extends FragmentActivity implements
                 return;
             }
 
-            //What does this piece of code do
-            //-------------------------------
-
             // Getting URL to the Google Directions API
             String url = getDirectionsUrl(origin, dest);
             DownloadTask downloadTask = new DownloadTask();
 
             // Start downloading json data from Google Directions API
             downloadTask.execute(url);
+
             currentButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
-                public void onClick(View v) {
-                    dialog = new AlertDialog.Builder(mActivity/*, R.layout.dialog_book*/).setCancelable(false).setPositiveButton("Book", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialog.cancel();
-                            Toast.makeText(mActivity, "Very well, navigating you to your spot", Toast.LENGTH_SHORT).show();
-                            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                            intent.setPackage("com.google.android.apps.maps");
-                            startActivity(intent);
-                        }
-                    }).setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialog.cancel();
-                        }
-                    }).setTitle("Confirm booking")
-                            .setMessage("Let's take you to this parking spot, but first choose a payment menthod").create();
-                    dialog.show();
-
-                }
+                public void onClick(View v) {   showDialog(dest);   }
             });
         }
+    }
+
+    public void showDialog(final LatLng dest){
+
+        // ---------------------------STUB-----------------------------
+        String BALANCE = "balance";
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        prefs.edit().putFloat(BALANCE, 345.25f).commit();
+        // ------------------------END OF STUB-------------------------
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        LayoutInflater inflater = mActivity.getLayoutInflater();
+        final View alert = inflater.inflate(R.layout.dialog_book, null);
+
+        dialog = builder.create();
+        dialog.setView(alert, 25, 45, 25, 30);
+        dialog.setCancelable(true);
+        ((TextView)alert.findViewById(R.id.val)).setText("$ "+ String.valueOf(prefs.getFloat(BALANCE, 0f)));
+        alert.findViewById(R.id.yes).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.cancel();
+                Toast.makeText(mActivity, "Very well, navigating you to your spot", Toast.LENGTH_SHORT).show();
+                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", dest.latitude, dest.longitude, "Parking Lot");
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                intent.setPackage("com.google.android.apps.maps");
+                startActivity(intent);
+            }
+        });
+        alert.findViewById(R.id.no).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {    dialog.cancel();    }
+        });
+
+        dialog.show();
     }
 
     @Override
@@ -818,18 +833,15 @@ public class MapsActivity extends FragmentActivity implements
     public void onPause(){
         Plotter.getInstance(mActivity).cleardata();
         Log.e("done","deleted");
-        mActivity.unregisterReceiver(PeriodicBrodcast);
-        mActivity.unregisterReceiver(DemandBrodcast);
+        try {
+            mActivity.unregisterReceiver(PeriodicBrodcast);
+            mActivity.unregisterReceiver(DemandBrodcast);
+        }catch(IllegalArgumentException e){
+            e.printStackTrace();
+        }
 
         super.onPause();
     }
-    /*@Override
-    public void onBackPressed(){
-
-        super.onBackPressed();
-    }*/
-
-
 
     public static double calculateCircleRadiusMeterForMapCircle(final int _targetRadiusDip, final double _circleCenterLatitude,
                                                                 final float _currentMapZoom) {

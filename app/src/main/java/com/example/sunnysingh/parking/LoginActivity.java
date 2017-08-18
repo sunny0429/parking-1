@@ -1,14 +1,18 @@
 package com.example.sunnysingh.parking;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,6 +36,8 @@ public class LoginActivity extends FragmentActivity{
     EditText username;
     EditText password;
     Button submit;
+    EditText balance;
+    ImageButton add;
     SharedPreferences login;
     public static final String MyLOGINPREFERENCES = "MyLoginPreferences" ;
     public static final String Username = "usernameKey";
@@ -45,6 +51,8 @@ public class LoginActivity extends FragmentActivity{
         username= findViewById(R.id.username);
         password = findViewById(R.id.password);
         submit = findViewById(R.id.submit);
+        balance = (EditText)findViewById(R.id.edit_balance);
+        add = findViewById(R.id.add);
         context = getBaseContext();
 
         login = context.getSharedPreferences(MyLOGINPREFERENCES, Context.MODE_PRIVATE);
@@ -60,14 +68,12 @@ public class LoginActivity extends FragmentActivity{
                 Toast.makeText(this,"User Screen",Toast.LENGTH_SHORT).show();
                 startActivity(i);
             }
-
-
-
     }
 
     public void submit(View v) {
         final String user = username.getText().toString();
         final String pass = password.getText().toString();
+        //username= sunny@ntcs.com, pass=sunnylogin
         String url = "https://intense-refuge-23593.herokuapp.com/login/?user="+user+"&pass="+pass;
         login = context.getSharedPreferences(MyLOGINPREFERENCES, Context.MODE_PRIVATE);
 
@@ -121,6 +127,56 @@ public class LoginActivity extends FragmentActivity{
             }
         });
         rq.add(jsonObject);
+    }
 
+    public void showInspectorScreen(View view){
+        new AlertDialog.Builder(this)
+                .setTitle("Are you sure")
+                .setMessage("Populate the task Json first.\nThis action will break the application.")
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                        startActivity(new Intent(getParent(), InspectorActivity.class));
+                    }
+                })
+                .create().show();
+    }
+
+    public void showFields(View view){
+        if(balance.getVisibility() != View.VISIBLE) {
+            balance.setVisibility(View.VISIBLE);
+            balance.setText(String.valueOf(
+                    context.getSharedPreferences(MyLOGINPREFERENCES, MODE_PRIVATE).getFloat("balance", 0.0f)
+                    ));
+            add.setVisibility(View.VISIBLE);
+        }else{
+            balance.setVisibility(View.GONE);
+            add.setVisibility(View.GONE);
+        }
+    }
+
+    public void addBalance(View view){
+        String value = balance.getText().toString();
+        try{
+            context.getSharedPreferences(MyLOGINPREFERENCES, MODE_PRIVATE)
+                    .edit()
+                    .putFloat("balance", Float.parseFloat(value))
+                    .commit();
+        }catch(Exception e){    e.printStackTrace();    }
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (imm.isAcceptingText()) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        balance.setVisibility(View.GONE);
+        add.setVisibility(View.GONE);
+        Toast.makeText(context, "Balance Updated", Toast.LENGTH_SHORT).show();
     }
 }
